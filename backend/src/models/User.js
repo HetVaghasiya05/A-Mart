@@ -1,13 +1,38 @@
 const mongoose = require('mongoose');
+const bcrypt = require('bcrypt');
 
 const UserSchema = new mongoose.Schema({
-    name: { type: String, required: true },
-    email: { type: String, unique: true, sparse: true },
-    phone: { type: String, unique: true, sparse: true },
-    password: { type: String, required: true },
-    otp: { type: String },
-    otpExpires: { type: Date },
-    isVerified: { type: Boolean, default: false }, // ✅ Mark user as verified after OTP
+    email: {
+        type: String,
+        required: true,
+        unique: true,
+        lowercase: true,
+        trim: true
+    },
+    password: {
+        type: String,
+        required: true
+    },
+    
 }, { timestamps: true });
 
-module.exports = mongoose.model('User', UserSchema);
+// Hash password before saving the user
+UserSchema.pre('save', async function (next) {
+    if (!this.isModified('password')) return next();
+    try {
+        const salt = await bcrypt.genSalt(10);
+        this.password = await bcrypt.hash(this.password, salt);
+        next();
+    } catch (error) {
+        next(error);
+    }
+});
+
+// Compare password method
+UserSchema.methods.comparePassword = async function (password) {
+    return bcrypt.compare(password, this.password);
+};
+
+const User = mongoose.model('User', UserSchema);
+
+module.exports = User;

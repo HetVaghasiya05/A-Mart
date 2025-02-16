@@ -7,8 +7,8 @@ router.get("/", async (req, res) => {
   try {
     const { category } = req.query; 
     const products = category ? await Product.find({ category }) : await Product.find();
-    // res.json(products); 
-    res.render("home", {products});   
+    res.json(products); 
+     
   } catch (error) {
     res.status(500).json({ message: "Server Error", error });
   }
@@ -17,9 +17,6 @@ router.get("/", async (req, res) => {
 
 router.get("/:name", async (req, res) => {
   try {
-    // const product = await Product.find({ name: req.params.name });
-    // res.json(products);
-
      const productName = req.params.name;
      const product = await Product.findOne({ name: productName });
 
@@ -27,7 +24,7 @@ router.get("/:name", async (req, res) => {
       return res.status(404).send('Product not found');
     }
 
-     res.render("product", { product });
+    res.json(product);
   } catch (error) {
     res.status(500).json({ message: "Server Error", error });
   }

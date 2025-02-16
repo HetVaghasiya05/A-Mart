@@ -3,6 +3,9 @@ const mongoose = require("mongoose");
 const bodyParser = require("body-parser")
 const dotenv = require("dotenv");
 const cors = require("cors");
+const productRoutes = require("./src/routes/productRoutes");
+const authRoutes = require("./src/routes/authRoutes");
+
 
 dotenv.config();
 const INFOBIP_API_KEY = process.env.INFOBIP_API_KEY;
@@ -24,10 +27,8 @@ mongoose
   .then(() => console.log("✅ MongoDB Connected Successfully!"))
   .catch((err) => console.error("❌ MongoDB Connection Error:", err));
 
-const productRoutes = require("./src/routes/productRoutes");
 app.use("/api/products", productRoutes);
-
-app.use('/api/auth', require('./src/routes/authRoutes'));
+app.use("/api/auth", authRoutes);
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
